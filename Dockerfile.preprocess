@@ -10,5 +10,5 @@ RUN apt-get update && \
 
 RUN mkdir /opt/server
 WORKDIR /opt/server
-ADD . /opt/server
+ADD ./preprocess-src /opt/server
 RUN pip install -r requirements.txt

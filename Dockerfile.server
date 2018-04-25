@@ -9,7 +9,7 @@ RUN luarocks install https://raw.githubusercontent.com/benglard/htmlua/master/ht
     luarocks install https://raw.githubusercontent.com/benglard/waffle/master/waffle-scm-1.rockspec
 
 RUN mkdir /opt/server
-ADD ../lua-src /opt/server
+ADD ./lua-src /opt/server
 
 EXPOSE 8080
 WORKDIR /opt/server
