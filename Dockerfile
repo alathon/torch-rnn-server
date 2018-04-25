@@ -7,10 +7,10 @@ ENV DEBCONF_NONINTERACTIVE_SEEN true
 # Required packages
 RUN apt-get update
 RUN apt-get -y install \
-    sudo \
     build-essential \
     git \
     libhdf5-dev \
+    sudo \
     software-properties-common \
     wget
 
@@ -27,8 +27,9 @@ ENV PATH=/root/torch/install/bin:$PATH
 RUN luarocks install cutorch && \
     luarocks install cunn && \
     luarocks install cudnn && \
-    luarocks install optim
-RUN luarocks install lua-cjson && \
+    luarocks install nn && \
+    luarocks install optim && \
+    luarocks install lua-cjson && \
     luarocks install https://raw.githubusercontent.com/benglard/htmlua/master/htmlua-scm-1.rockspec && \
     luarocks install https://raw.githubusercontent.com/benglard/waffle/master/waffle-scm-1.rockspec
 
@@ -36,9 +37,6 @@ RUN luarocks install lua-cjson && \
 RUN git clone https://github.com/deepmind/torch-hdf5 && \
   cd torch-hdf5 && \
   luarocks make hdf5-0-0.rockspec 
-
-# TODO: Move this up to first luarocks command above
-RUN luarocks install nn
 
 RUN mkdir /opt/server
 ADD . /opt/server
