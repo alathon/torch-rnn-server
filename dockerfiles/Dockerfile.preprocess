@@ -1,0 +1,14 @@
+FROM python:2.7
+
+# install scikit-learn with dependencies - 
+# modified from: https://hub.docker.com/r/mubo/sklearn/~/dockerfile/
+RUN apt-get update && \
+    apt-get install -y \
+      pkg-config libopenblas-dev liblapack-dev \
+      build-essential gfortran python-dev libfreetype6-dev \
+      libjpeg-dev libhdf5-dev liblzo2-dev libbz2-dev
+
+RUN mkdir /opt/server
+WORKDIR /opt/server
+ADD . /opt/server
+RUN pip install -r requirements.txt

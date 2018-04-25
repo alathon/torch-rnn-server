@@ -2,10 +2,10 @@ mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 
 DATA_DIR ?= $(dir $(mkfile_path))data
 
-IMAGE_NAME ?= torch-rnn-server
-
 VOL_NAME ?= /data
 VOL ?= -v $(DATA_DIR):$(VOL_NAME)
+
+MOUNT ?= -v $(DATA_DIR):$(VOL_NAME)
 
 PREPROCESS_FLAGS ?= -it
 TRAIN_FLAGS ?= -it
@@ -19,22 +19,25 @@ TRAIN_ARGS ?= -model_type rnn -num_layers 3 -rnn_size 256 -checkpoint_name '$(VO
 
 MODEL_NAME ?= invalid_model.t7
 
-.PHONY: build run-bash train preprocess
+.PHONY: build-torch build-preprocess build-server run-preprocess train preprocess serve
 
-build: Dockerfile
-	docker build -t $(IMAGE_NAME) -f Dockerfile .
+build-torch:
+	docker build -t diku-hcc/torch -f dockerfiles/Dockerfile.torch .
 
-run-bash:
-	docker run --runtime=nvidia $(VOL) -it torch-rnn-server bash
+build-server: 
+	docker build -t diku-hcc/server -f dockerfiles/Dockerfile.server .
+
+build-preprocess:
+	docker build -t diku-hcc/preprocess -f dockerfiles/Dockerfile.preprocess .
+
+run-preprocess:
+	docker run --runtime=nvidia $(VOL) -it diku-hcc/preprocess:latest bash
 
 preprocess:
-	docker run $(VOL) $(PREPROCESS_FLAGS) $(IMAGE_NAME) bash /opt/server/docker-scripts/preprocess.sh $(VOL_NAME)/$(PREP_INPUT_FILE) $(VOL_NAME)/generated/$(PREP_OUTPUT_FILE)
+	docker run $(VOL) $(PREPROCESS_FLAGS) diku-hcc/preprocess:latest python /opt/server/preprocess.py --input_txt "$(VOL_NAME)/$(PREP_INPUT_FILE)" --output_h5 "$(VOL_NAME)/generated/$(PREP_OUTPUT_FILE).h5" --output_json "$(VOL_NAME)/generated/$(PREP_OUTPUT_FILE).json"
 
 train:
-	docker run --runtime=nvidia $(VOL) $(TRAIN_FLAGS) $(IMAGE_NAME) bash /opt/server/docker-scripts/train.sh $(VOL_NAME)/generated/$(PREP_OUTPUT_FILE) $(TRAIN_ARGS)
+	docker run --runtime=nvidia $(VOL) $(TRAIN_FLAGS) diku-hcc/base:latest bash /opt/server/docker-scripts/train.sh $(VOL_NAME)/generated/$(PREP_OUTPUT_FILE) $(TRAIN_ARGS)
 
 serve:
-	docker run --runtime=nvidia -p 8080:8080 $(VOL) $(IMAGE_NAME) th server.lua -checkpoint '$(VOL_NAME)/checkpoints/$(MODEL_NAME)'
-
-clean:
-	docker run $(VOL) -it $(IMAGE_NAME) rm -rf $(VOL)/generated
+	docker run --runtime=nvidia -p 8080:8080 $(VOL) diku-hcc/server:latest th server.lua -checkpoint '$(VOL_NAME)/checkpoints/$(MODEL_NAME)'

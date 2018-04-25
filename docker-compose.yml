@@ -1,9 +1,0 @@
-version: '2'
-services:
-  lua-server:
-    image: jonathanost/rnn-server
-    container_name: lua-server
-    working_dir: /opt/server
-    command: th server.lua -gpu -1
-    ports:
-      - "8080:8080"

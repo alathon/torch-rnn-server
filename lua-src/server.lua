@@ -3,7 +3,7 @@ require 'nn'
 require 'LanguageModel'
 
 local cmd = torch.CmdLine()
-cmd:option('-checkpoint', 'data/checkpoints/scifi-model.t7') -- http://from.robinsloan.com/rnn-writer/scifi-model.zip
+cmd:option('-checkpoint', '../data/checkpoints/scifi-model.t7') -- http://from.robinsloan.com/rnn-writer/scifi-model.zip
 cmd:option('-word_limit_short', 3)
 cmd:option('-word_limit_long', 20)
 cmd:option('-port', 8080)
