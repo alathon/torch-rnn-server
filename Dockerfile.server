@@ -1,4 +1,4 @@
-FROM diku-hcc/base:latest
+FROM diku-hcc/torch:latest
 MAINTAINER Martin Gruenbaum "martin@itsolveonline.net"
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -9,7 +9,8 @@ RUN luarocks install https://raw.githubusercontent.com/benglard/htmlua/master/ht
     luarocks install https://raw.githubusercontent.com/benglard/waffle/master/waffle-scm-1.rockspec
 
 RUN mkdir /opt/server
-ADD ./lua-src /opt/server
-
+ADD ./src/server /opt/server
 EXPOSE 8080
 WORKDIR /opt/server
+
+CMD "/bin/bash"

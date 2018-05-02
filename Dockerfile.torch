@@ -1,34 +1,9 @@
-FROM nvidia/cuda:9.1-cudnn7-devel-ubuntu16.04
+FROM diku-hcc/base:latest
 MAINTAINER Martin Gruenbaum "martin@itsolveonline.net"
 
-# Required packages
-RUN apt-get update
-RUN apt-get -y install \
-    build-essential \
-    git \
-    libhdf5-dev \
-    sudo \
-    software-properties-common \
-    wget
+RUN mkdir /opt/torch
+ADD ./src/torch /opt/torch
+ADD ./docker-scripts/torch /opt/torch/scripts
+WORKDIR /opt/torch
 
-# Install Torch
-RUN git clone https://github.com/torch/distro.git /root/torch --recursive && cd /root/torch && \
-    bash install-deps 
-
-RUN cd /root/torch && \
-    TORCH_NVCC_FLAGS="-D__CUDA_NO_HALF_OPERATORS__" ./install.sh
-
-ENV PATH=/root/torch/install/bin:$PATH
-
-# Lua dependencies
-RUN luarocks install cutorch && \
-    luarocks install cunn && \
-    luarocks install cudnn && \
-    luarocks install nn && \
-    luarocks install optim && \
-    luarocks install lua-cjson
-
-# Install HDF5
-RUN git clone https://github.com/deepmind/torch-hdf5 && \
-  cd torch-hdf5 && \
-  luarocks make hdf5-0-0.rockspec 
+CMD "th"

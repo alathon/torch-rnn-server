@@ -8,7 +8,9 @@ RUN apt-get update && \
       build-essential gfortran python-dev libfreetype6-dev \
       libjpeg-dev libhdf5-dev liblzo2-dev libbz2-dev
 
-RUN mkdir /opt/server
-WORKDIR /opt/server
-ADD ./preprocess-src /opt/server
+RUN mkdir /opt/preprocess
+WORKDIR /opt/preprocess
+ADD ./docker-scripts/preprocess /opt/preprocess
 RUN pip install -r requirements.txt
+
+CMD "/bin/bash"

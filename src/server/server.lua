@@ -1,3 +1,6 @@
+-- Include dependencies from model in path
+package.path = "/opt/torch/?.lua;" .. package.path
+
 require 'torch'
 require 'nn'
 require 'LanguageModel'
