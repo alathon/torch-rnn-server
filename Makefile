@@ -15,10 +15,10 @@ MOUNT=-v $(DATA_DIR):$(MOUNT_NAME)
 build-base:
 	docker build -t diku-hcc/base -f Dockerfile.base .
 
-build-torch:
+build-torch: build-base
 	docker build -t diku-hcc/torch -f Dockerfile.torch .
 
-build-server:
+build-server: build-base build-torch
 	docker build -t diku-hcc/server -f Dockerfile.server .
 
 build-preprocess:

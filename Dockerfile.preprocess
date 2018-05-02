@@ -13,4 +13,4 @@ WORKDIR /opt/preprocess
 ADD ./src/preprocess /opt/preprocess
 RUN pip install -r requirements.txt
 
-CMD "/bin/bash"
+CMD ["/bin/bash"]

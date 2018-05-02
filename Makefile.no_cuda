@@ -5,32 +5,32 @@ DOCKER_FLAGS ?=-it
 MODEL_NAME ?= "invalid-model.t7"
 
 # You probably shouldn't touch these
-SERVE_CMD=th /opt/server/server.lua -checkpoint '$(MOUNT_NAME)/checkpoints/$(MODEL_NAME)'
+SERVE_CMD=th /opt/server/server.lua -checkpoint '$(MOUNT_NAME)/checkpoints/$(MODEL_NAME)' -gpu_backend cpu
 MOUNT_NAME=/data
 MOUNT=-v $(DATA_DIR):$(MOUNT_NAME)
 
 .PHONY: build-base build-server build-torch build-preprocess preprocess server torch
 
 build-base:
-	docker build -t diku-hcc/base -f Dockerfile.base .
+	docker build -t diku-hcc/base-no-cuda -f Dockerfile.base_no_cuda .
 
-build-torch:
-	docker build -t diku-hcc/torch -f Dockerfile.torch .
+build-torch: build-base
+	docker build -t diku-hcc/torch-no-cuda -f Dockerfile.torch_no_cuda .
 
-build-server:
-	docker build -t diku-hcc/server -f Dockerfile.server .
+build-server: build-base build-torch
+	docker build -t diku-hcc/server-no-cuda -f Dockerfile.server_no_cuda .
 
 build-preprocess:
 	docker build -t diku-hcc/preprocess -f Dockerfile.preprocess .
 
 torch:
-	docker run $(MOUNT) $(DOCKER_FLAGS) diku-hcc/torch:latest $(CMD)
+	docker run $(MOUNT) $(DOCKER_FLAGS) diku-hcc/torch-no-cuda:latest $(CMD)
 
 server:
-	docker run $(MOUNT) $(DOCKER_FLAGS) diku-hcc/server:latest $(CMD)
+	docker run $(MOUNT) $(DOCKER_FLAGS) diku-hcc/server-no-cuda:latest $(CMD)
 
 serve:
-	docker run -p 8080:8080 $(MOUNT) $(DOCKER_FLAGS) diku-hcc/server:latest $(SERVE_CMD)
+	docker run -p 8080:8080 $(MOUNT) $(DOCKER_FLAGS) diku-hcc/server-no-cuda:latest $(SERVE_CMD)
 
 preprocess:
 	docker run $(MOUNT) $(DOCKER_FLAGS) diku-hcc/preprocess:latest $(CMD)

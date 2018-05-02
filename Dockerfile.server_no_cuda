@@ -1,4 +1,4 @@
-FROM diku-hcc/torch:latest
+FROM diku-hcc/torch-no-cuda:latest
 MAINTAINER Martin Gruenbaum "martin@itsolveonline.net"
 
 ENV DEBIAN_FRONTEND noninteractive

@@ -1,4 +1,4 @@
-FROM ubuntu/xenial
+FROM ubuntu:16.04
 MAINTAINER Martin Gruenbaum "martin@itsolveonline.net"
 
 # Required packages
