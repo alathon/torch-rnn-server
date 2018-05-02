@@ -44,7 +44,7 @@ First build and run the container:
 ```
 make build-preprocess
 make preprocess
-``
+```
 
 Then run the preprocess script:
 ```
