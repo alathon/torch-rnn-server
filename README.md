@@ -117,12 +117,12 @@ reason at all to use this fork. If you would like to use Docker, but not CUDA, I
 section about that below.
 
 ### Using Docker but not CUDA
+Either rename `Makefile.no_cuda` to `Makefile`, or use `make -f Makefile.no_cuda` with all of the same make targets 
+as above. The `Makefile.no_cuda` file uses all of the `Dockerfile.xxx_no_cuda` files, which are an attempt to strip
+anything CUDA-related from the Docker images.
 
-Rename `Makefile.no_cuda` to `Makefile`, and `Dockerfile.base_no_cuda` to `Dockerfile.base`. Note
-that I haven't worked with this yet, but in theory that will let you build everything without the
-CUDA dependencies, basing the core image off of Ubuntu 16.04 instead of the NVIDIA CuDNN7 + CUDA 9.1 image.
-
-The original readme from [`robinsloan/torch-rnn-server`](https://github.com/robinsloan/torch-rnn-server) can be found below.
+Very little testing has been done on the `_no_cuda` Dockerfiles, so YMMV. They are based off plain Ubuntu 16.04 instead
+of the NVIDIA CUDA images.
 
 ### Original readme from robinsloan/torch-rnn-server
 This is a small server that works with the Atom package [`rnn-writer`](https://github.com/robinsloan/rnn-writer) to provide responsive, inline "autocomplete" powered by a recurrent neural network trained on a corpus of sci-fi stories, or another corpus of your choosing.
