@@ -11,8 +11,8 @@ local unpack = unpack or table.unpack
 local cmd = torch.CmdLine()
 
 -- Dataset options
-cmd:option('-input_h5', '../data/tiny-shakespeare.h5')
-cmd:option('-input_json', '../data/tiny-shakespeare.json')
+cmd:option('-input_h5', '../../data/generated/tiny-shakespeare.h5')
+cmd:option('-input_json', '../../data/generated/tiny-shakespeare.json')
 cmd:option('-batch_size', 50)
 cmd:option('-seq_length', 50)
 
@@ -36,7 +36,7 @@ cmd:option('-lr_decay_factor', 0.5)
 -- Output options
 cmd:option('-print_every', 1)
 cmd:option('-checkpoint_every', 1000)
-cmd:option('-checkpoint_name', '../data/checkpoints/checkpoint')
+cmd:option('-checkpoint_name', '../../data/checkpoints/checkpoint')
 
 -- Benchmark options
 cmd:option('-speed_benchmark', 0)

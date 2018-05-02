@@ -1,5 +1,5 @@
--- Include dependencies from model in path
-package.path = "/opt/torch/?.lua;" .. package.path
+-- Include dependencies from torch folder
+package.path = "../torch/?.lua;" .. package.path
 
 require 'torch'
 require 'nn'
