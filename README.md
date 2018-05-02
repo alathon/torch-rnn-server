@@ -1,4 +1,111 @@
-# torch-rnn-server
+# torch-rnn-server fork
+This is a Dockerized and slightly modified version of [`torch-rnn-server`](https://github.com/robinsloan/torch-rnn-server) that allows you to do preprocessing in Python, run Torch interactively, train a model and serve the model all via docker containers. A Makefile is provided for easier access to building
+the necessary containers and running them with sensible arguments.
+
+Thank you to [`Robin Sloan`](https://github.com/robinsloan/) for his excellent work on `torch-rnn-server` thus far!
+
+### Installation
+
+Because everything runs inside Docker containers, you do not need Torch, Lua, HDF5, etc.
+Instead you will just need to install the following:
+
+- Docker (e.g, [`Docker CE`](https://www.docker.com/community-edition))
+- NVIDIA Docker runtime (if you want to use CUDA) [NVIDIA/nvidia-docker](https://github.com/NVIDIA/nvidia-docker)
+
+### General concepts
+
+The Makefile provides tasks to both build containers (`build-xxx`), and to run them (`xxx`).
+This is useful because it specifies a lot of command-line arguments that you may often need
+when running these containers, such as mounting a data directory at a common location in the container,
+exposing ports when serving the webserver, and specifying the NVIDIA runtime (if used). By default,
+containers run using the NVIDIA runtime -- you must either change the `RUNTIME` variable in the Makefile
+or specify `RUNTIME= ` when running make tasks if you do not want to use it.
+
+By default all containers mount the `data` folder to `/data/` inside the container, allowing anything
+in there to be manipulated both inside and outside of Docker containers.
+
+### Data layout and expectations
+
+Containers expect there to be a `/data` mount available, and several scripts or lua files expect
+`/data/generated` to hold `.h5` and `.json` generated files, and `/data/checkpoints` to hold model
+checkpoints. Everything has been modified to output to the correct folders according to
+this.
+
+### Preprocessing
+
+The Dockerfile `Dockerfile.preprocess` provides a Python2.7 environment with the necessary
+dependencies to run the torch-rnn-server's preprocessing script. To build the container run
+`make build-preprocess`, and to run an interactive Bash shell inside it run `make preprocess`.
+The files in `src/preprocess` are available in the `/opt/preprocess` folder for use.
+
+As an example, to preprocess the provided `tiny-shakespeare.txt`:
+
+First build and run the container:
+```
+make build-preprocess
+make preprocess
+``
+
+Then run the preprocess script:
+```
+cd /opt/preprocess
+python preprocess.py
+```
+
+This will generate `/data/generated/tiny-shakespeare.h5` and `/data/generated/tiny-shakespeare.json`.
+
+### Training
+
+The Dockerfile `Dockerfile.torch` provides a Torch environment based off the official CUDA image `nvidia/cuda:9.1-cudnn7-devel-ubuntu16.04`, which additionally installs Torch and all of the necessary Lua
+dependencies to train a neural network using Torch with CUDA, along with HDF5. This can be used
+both as an interactive Torch session (just run `make torch` for that), or can be used to train a
+Torch model as follows:
+
+First build and run the container (note: This will take a while, due to building `diku-hcc/base`!):
+```
+make build-torch
+CMD=bash make torch
+```
+
+Then run the training helper script:
+```
+cd /opt/torch
+python scripts/train.py
+```
+
+The Python script will spawn a subprocess to run `/opt/torch/train.lua` with sensible arguments,
+but you can also override them by specifying command-line arguments. See `docker-scripts/torch/train.py` for more details
+
+### Serving
+
+The Dockerfile `Dockerfile.server` provides a Lua webserver on top of the Torch container, and by
+default will expose port 8080. To serve a trained model `data/checkpoints/my-model.t7`, run `MODEL_NAME="my-model.t7" make serve`.
+
+### Why? And should I use this over the original `torch-rnn-server`?
+
+This fork exists primarily to make it (much) easier to get up and running, without a _lot_ of
+system-specific dependencies all over the place. Even then, it relies on a specific NVIDIA-provided
+CUDA 9.1 image. If you think reproducible environments are a good thing, and you want to run CUDA-backed
+model training in containers, then this fork might be of interest to you.
+
+If you do not intend to run the Docker containers, and you are not using CUDA, then there is no
+reason at all to use this fork. If you would like to use Docker, but not CUDA, I've added a small
+section about that below.
+
+### Using Docker but not CUDA
+
+Rename `Makefile.no_cuda` to `Makefile`, and `Dockerfile.base_no_cuda` to `Dockerfile.base`. Note
+that I haven't worked with this yet, but in theory that will let you build everything without the
+CUDA dependencies, basing the core image off of Ubuntu 16.04 instead of the NVIDIA CuDNN7 + CUDA 9.1 image.
+
+### Using a different version of CUDA
+
+If your machine doesn't run CUDA 9.1 and you need to use an earlier version, then you can try
+a different base image from [`nvidia/cuda`](https://hub.docker.com/r/nvidia/cuda/) as
+the `FROM` statement in `Dockerfile.base`. The version you use should match the version of CUDA
+you have installed on the host machine, for the NVIDIA Docker runtime to function properly.
+
+The original readme from [`robinsloan/torch-rnn-server`](https://github.com/robinsloan/torch-rnn-server) can be found below.
 
 This is a small server that works with the Atom package [`rnn-writer`](https://github.com/robinsloan/rnn-writer) to provide responsive, inline "autocomplete" powered by a recurrent neural network trained on a corpus of sci-fi stories, or another corpus of your choosing.
 
