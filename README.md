@@ -1,4 +1,3 @@
-# torch-rnn-server fork
 This is a Dockerized and slightly modified version of [`torch-rnn-server`](https://github.com/robinsloan/torch-rnn-server) that allows you to do preprocessing in Python, run Torch interactively, train a model and serve the model all via docker containers. A Makefile is provided for easier access to building
 the necessary containers and running them with sensible arguments.
 
