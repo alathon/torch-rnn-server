@@ -12,6 +12,11 @@ Instead you will just need to install the following:
 - Docker (e.g, [`Docker CE`](https://www.docker.com/community-edition))
 - NVIDIA Docker runtime (if you want to use CUDA) [NVIDIA/nvidia-docker](https://github.com/NVIDIA/nvidia-docker)
 
+Note: _The version of your CUDA driver should match the CUDA runtime base image!_ - The default
+used in this repository is CUDA 9.1. If you are running an earlier or later version of CUDA,
+then you should modify the `FROM` statement in `Dockerfile.base` to reflect the correct version
+from [`nvidia/cuda`](https://hub.docker.com/r/nvidia/cuda/).
+
 ### General concepts
 
 The Makefile provides tasks to both build containers (`build-xxx`), and to run them (`xxx`).
@@ -98,15 +103,9 @@ Rename `Makefile.no_cuda` to `Makefile`, and `Dockerfile.base_no_cuda` to `Docke
 that I haven't worked with this yet, but in theory that will let you build everything without the
 CUDA dependencies, basing the core image off of Ubuntu 16.04 instead of the NVIDIA CuDNN7 + CUDA 9.1 image.
 
-### Using a different version of CUDA
-
-If your machine doesn't run CUDA 9.1 and you need to use an earlier version, then you can try
-a different base image from [`nvidia/cuda`](https://hub.docker.com/r/nvidia/cuda/) as
-the `FROM` statement in `Dockerfile.base`. The version you use should match the version of CUDA
-you have installed on the host machine, for the NVIDIA Docker runtime to function properly.
-
 The original readme from [`robinsloan/torch-rnn-server`](https://github.com/robinsloan/torch-rnn-server) can be found below.
 
+### Original readme from robinsloan/torch-rnn-server
 This is a small server that works with the Atom package [`rnn-writer`](https://github.com/robinsloan/rnn-writer) to provide responsive, inline "autocomplete" powered by a recurrent neural network trained on a corpus of sci-fi stories, or another corpus of your choosing.
 
 More accurately: it's a set of shims laid beneath Justin Johnson's indispensable `torch-rnn` package.
