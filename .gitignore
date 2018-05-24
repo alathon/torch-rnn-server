@@ -1,5 +1,9 @@
 *.t7
 *.json
+*.h5
+*.pkl
 *.zip
+*.txt
 .DS_Store
 .env
+data/generated
