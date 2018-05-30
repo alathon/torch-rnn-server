@@ -1,4 +1,7 @@
-#!/bin/sh
+#!/bin/bash
+
+# Source the exported DATA_DIR from ../data-dir.sh
+source $(dirname $(readlink -f "$0"))/../data-dir.sh
 
 # Set docker to run in detached mode, and run training script
 DOCKER_FLAGS="-d" CMD="python /opt/torch/docker-scripts/train.py \

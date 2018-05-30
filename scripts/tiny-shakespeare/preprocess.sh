@@ -1,4 +1,7 @@
-#!/bin/sh
+#!/bin/bash
+
+# Source the exported DATA_DIR from ../data-dir.sh
+source $(dirname $(readlink -f "$0"))/../data-dir.sh
 
 CMD="python preprocess.py \
 	--input_txt=/data/tiny-shakespeare.txt \

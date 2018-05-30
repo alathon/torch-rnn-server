@@ -1,4 +1,7 @@
-#!/bin/sh
+#!/bin/bash
+
+# Source the exported DATA_DIR from ../data-dir.sh
+source $(dirname $(readlink -f "$0"))/../data-dir.sh
 
 # Note: model name is just the name of the t7 file, not the full path,
 # e.g. checkpoint_10000.t7 not /data/checkpoints/checkpoint_10000.t7
