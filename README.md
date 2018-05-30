@@ -59,50 +59,73 @@ Containers expect there to be a `/data` mount available, and several scripts or 
 checkpoints. Everything has been modified to output to the correct folders according to
 this.
 
+The following steps assume we are trying to preprocess, train and then serve the `tiny-shakespeare` dataset,
+which starts as a `.txt` file we want to train on. We expect the file to be at `./data/tiny-shakespeare.txt`
+
 ### Preprocessing
 
-As an example, to preprocess the provided `tiny-shakespeare.txt`:
+The RNN model expects input in the form of a pair of `.h5` and `.json` file(s) representing the training
+data. The `preprocess.py` script from `torch-rnn-server` facilitates this.
 
-First build and run the container:
+First, build the preprocessing container: `make build-preprocess`
+
+Now to preprocess e.g., the `tiny-shakespeare.txt` dataset you can either go into the container and run 
+`preprocess.py` yourself:
 ```
-make build-preprocess
 make preprocess
+python preprocess.py --input_txt=/data/tiny-shakespeare.txt --output_h5=/data/generated/tiny-shakespeare.h5 --output_json=/data/generated/tiny-shakespeare.json
 ```
 
-Then run the preprocess script:
-```
-cd /opt/preprocess
-python preprocess.py
-```
+Or run the convenience script `./scripts/tiny-shakespeare/preprocess.sh` outside Docker which does
+the same thing.
 
 This will generate `/data/generated/tiny-shakespeare.h5` and `/data/generated/tiny-shakespeare.json`.
 
 ### Training
 
-First build and run the container:
-```
-make build-torch
-CMD=bash make torch
-```
+Training the RNN model requires Torch and Lua-dependencies, so you must use the torch Dockerfile for this.
 
-Then run the training helper script:
+First build the container: `make build-torch`
+
+Building the image may take a long time, if you haven't built the base image (`Dockerfile.base`) yet. This is normal, 
+but you will likely only need to build the base image once.
+
+Then either go into the container and run `train.py` yourself:
 ```
+make torch
 cd /opt/torch
-python scripts/train.py
+python scripts/train.py --input_json=/data/generated/tiny-shakespeare.json --input_h5=/data/generated/tiny-shakespeare.h5 --checkpoint_name=/data/checkpoints/tiny_shakespeare
 ```
 
-The Python script will spawn a subprocess to run `/opt/torch/train.lua` with sensible arguments,
-but you can also override them by specifying command-line arguments. See 
-`docker-scripts/torch/train.py` for more details.
-
-Note that building the image may take a long time, if you haven't built the base image (`Dockerfile.base`) yet. This is normal, but you will likely only need to build the base image once.
+Or run the convenience script `./scripts/tiny-shakespeare/train.sh`. This will spawn a detached Docker instance that
+will start training a model. To inspect it you can use e.g., `docker attach`, or if you want it to be in interactive mode
+instead, pass `DOCKER_FLAGS=-i`, i.e. `DOCKER_FLAGS=-i ./scripts/tiny-shakespeare/train.sh`.
 
 ### Serving
 
-To serve a trained model `data/checkpoints/my-model.t7`, run `MODEL_NAME="my-model.t7" make serve`,
-which starts the `Dockerfile.server` container and runs `server.lua` with proper arguments.
+Once done training, you can serve any `.t7` model using the Lua webserver this project comes with.
 
-### Why? And should I use this over the original `torch-rnn-server`?
+First, build the server container: `make build-server`
+
+Then supposing the `.t7` model file you want to run is called `tiny_shakespeare_250000.t7` then you can:
+
+Either run `MODEL_NAME=tiny_shakespeare_250000.t7 make serve`, or `./scripts/tiny-shakespeare/serve.sh tiny_shakespeare_250000.t7`
+which is just a shortcut for that Makefile command.
+
+### Specifying a different data directory
+
+By default, the project mounts the local `torch-rnn-server/data` folder as `/data` in the Docker containers, but you will
+likely want to keep your data out of this project repository and somewhere else. The `Makefile` allows you to override the
+`DATA_DIR` environment variable, which should point to the full path of the directory you want mounted as `/data` in the 
+containers. 
+
+You have 3 options:
+
+1. If you want to run `Makefile` tasks directly, then redefine `DATA_DIR` in the `Makefile` to point to the path you want it to.
+2. If you want to run via the `scripts/xxx/train|preprocess|serve.sh` files, then modify the exported `DATA_DIR` in `scripts/data-dir.sh`.
+3. Specify `DATA_DIR` manually in the `Makefile` tasks you run.
+
+### Should I use this over the original `torch-rnn-server`?
 
 This fork exists primarily to make it (much) easier to get up and running, without a _lot_ of
 system-specific dependencies all over the place. Even then, it relies on a specific NVIDIA-provided
