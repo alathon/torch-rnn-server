@@ -17,7 +17,7 @@ args = parser.parse_args()
 
 if __name__ == '__main__':
     overrides = ' '.join(args.overrides) if args.overrides else ''
-    th = 'th /opt/torch/train.lua -input_json {} -input_h5 {}'.format(args.input_json, args.input_h5)
+    th = 'th /opt/torch/train.lua -input_json {} -input_h5 {} -checkpoint_name {}'.format(args.input_json, args.input_h5, args.checkpoint_name)
     if overrides:
         th = th + ' {}'.format(overrides)
     th = th.split(' ')
