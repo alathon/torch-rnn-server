@@ -114,7 +114,7 @@ which is just a shortcut for that Makefile command.
 
 ### Specifying a different data directory
 
-By default, the project mounts the local `torch-rnn-server/data` folder as `/data` in the Docker containers, but you will
+By default, the project Makefile mounts the local `torch-rnn-server/data` folder as `/data` in the Docker containers, but you will
 likely want to keep your data out of this project repository and somewhere else. The `Makefile` allows you to override the
 `DATA_DIR` environment variable, which should point to the full path of the directory you want mounted as `/data` in the 
 containers. 
@@ -122,7 +122,7 @@ containers.
 You have 3 options:
 
 1. If you want to run `Makefile` tasks directly, then redefine `DATA_DIR` in the `Makefile` to point to the path you want it to.
-2. If you want to run via the `scripts/xxx/train|preprocess|serve.sh` files, then modify the exported `DATA_DIR` in `scripts/data-dir.sh`.
+2. If you want to run via the `scripts/xxx/train|preprocess|serve.sh` files, then modify the exported `DATA_DIR` in `scripts/data-dir.sh`, which by default points to `/data` not the local data directory.
 3. Specify `DATA_DIR` manually in the `Makefile` tasks you run.
 
 ### Should I use this over the original `torch-rnn-server`?
