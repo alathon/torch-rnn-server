@@ -3,7 +3,7 @@ MAINTAINER Martin Gruenbaum "martin@itsolveonline.net"
 
 RUN mkdir /opt/torch
 ADD ./src/torch /opt/torch
-ADD ./docker-scripts/torch /opt/torch/scripts
+ADD ./docker-scripts/torch /opt/torch/docker-scripts
 WORKDIR /opt/torch
 
-CMD ["th"]
+CMD ["/bin/bash"]

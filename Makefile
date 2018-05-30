@@ -1,7 +1,7 @@
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 
 DATA_DIR ?= $(dir $(mkfile_path))data
-DOCKER_FLAGS ?=-it
+DOCKER_FLAGS ?=-i
 MODEL_NAME ?= "invalid-model.t7"
 RUNTIME ?= --runtime=nvidia
 
@@ -25,13 +25,13 @@ build-preprocess:
 	docker build -t diku-hcc/preprocess -f Dockerfile.preprocess .
 
 torch:
-	docker run $(RUNTIME) $(MOUNT) $(DOCKER_FLAGS) diku-hcc/torch:latest $(CMD)
+	docker run $(RUNTIME) $(MOUNT) $(DOCKER_FLAGS) -w /opt/torch -t diku-hcc/torch:latest $(CMD)
 
 server:
-	docker run $(RUNTIME) $(MOUNT) $(DOCKER_FLAGS) diku-hcc/server:latest $(CMD)
+	docker run $(RUNTIME) $(MOUNT) $(DOCKER_FLAGS) -w /opt/server -t diku-hcc/server:latest $(CMD)
 
 serve:
-	docker run $(RUNTIME) -p 8080:8080 $(MOUNT) $(DOCKER_FLAGS) diku-hcc/server:latest $(SERVE_CMD)
+	docker run $(RUNTIME) -p 8080:8080 $(MOUNT) $(DOCKER_FLAGS) -w /opt/server -t diku-hcc/server:latest $(SERVE_CMD)
 
 preprocess:
-	docker run $(RUNTIME) $(MOUNT) $(DOCKER_FLAGS) diku-hcc/preprocess:latest $(CMD)
+	docker run $(RUNTIME) $(MOUNT) $(DOCKER_FLAGS) -w /opt/preprocess -t diku-hcc/preprocess:latest $(CMD)
