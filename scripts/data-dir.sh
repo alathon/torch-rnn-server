@@ -1,1 +1,1 @@
-export DATA_DIR=/data
+export DATA_DIR=/data/torch-rnn-server

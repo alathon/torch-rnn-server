@@ -13,4 +13,4 @@ subfolders here automatically source `data-dir.sh` which exports
 a valid `DATA_DIR`. You must therefore _modify_ that file to export
 the full path to the location you want to mount as /data in the container.
 
-By default, `/data` is mounted to `/data` in the container.
+By default, `/data/torch-rnn-server` is mounted to `/data` in the container.
